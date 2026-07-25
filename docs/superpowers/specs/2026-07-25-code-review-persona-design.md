@@ -57,6 +57,10 @@ Fallback:
 - Diff vide (aucune sortie) → stop immédiatement, message court "Rien à
   review, diff vide.", ne PAS dispatcher les subagents.
 - Pas dans un repo git → message d'erreur clair, stop.
+- Fichiers non trackés (`git ls-files --others --exclude-standard` non
+  vide) → ces fichiers sont absents du diff (jamais `git add`-és) et ne
+  seront pas reviewés; avertir l'utilisateur dans la réponse finale et
+  suggérer `git add -N .` avant de relancer.
 
 ## Étape 2 — Les 4 personas (fixes)
 
@@ -81,13 +85,16 @@ d'un autre).
 
 Un seul message contenant 4 appels `Agent` en parallèle, `subagent_type:
 general-purpose`, `run_in_background: false` (on a besoin des 4 résultats
-avant d'agréger).
+avant d'agréger). Les 4 agents sont dispatchés un par persona, dans cet
+ordre fixe: Sécurité, Perf, Lisibilité, Débutant (maintenance 2 ans).
 
 Chaque prompt d'agent reçoit, en autonome (les agents ne se voient pas
 entre eux):
 - Le texte complet du diff calculé à l'étape 1
 - Le chemin du repo (accès Read/Grep/Bash pour explorer contexte: fichiers
-  entiers touchés, conventions existantes, tests présents)
+  entiers touchés, conventions existantes, tests présents). Lecture seule:
+  l'agent ne doit modifier, créer ou supprimer aucun fichier — il retourne
+  uniquement son rapport en texte.
 - La définition stricte de son persona et angle (ci-dessus), avec consigne
   explicite d'ignorer les autres angles
 - Consigne de format de sortie: liste de findings en markdown, chacun avec
