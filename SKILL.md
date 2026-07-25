@@ -114,7 +114,7 @@ l'Étape 4.
 2. Écrire `docs/reviews/YYYY-MM-DD-HHMM-persona-review.md` (date/heure
    réelles au moment de l'exécution) avec:
 
-   ```markdown
+   ````markdown
    # Revue multi-persona — YYYY-MM-DD HH:MM
 
    Diff analysé:
@@ -139,7 +139,7 @@ l'Étape 4.
    ## Débutant (maintenance 2 ans)
 
    <rapport brut de l'agent Débutant, ou message d'échec>
-   ```
+   ````
 
 3. Ne jamais fusionner, re-classer ou dédupliquer les findings entre
    sections — chaque section reste le rapport brut de son agent.
