@@ -107,3 +107,42 @@ ni leurs résultats), construit ainsi:
 Si un agent échoue ou ne retourne rien d'exploitable: continuer avec les 3
 autres, ne pas relancer, ne pas bloquer l'agrégation. Noter l'échec pour
 l'Étape 4.
+
+## Étape 4 — Agrégation et sortie
+
+1. Créer le dossier `docs/reviews/` s'il n'existe pas.
+2. Écrire `docs/reviews/YYYY-MM-DD-HHMM-persona-review.md` (date/heure
+   réelles au moment de l'exécution) avec:
+
+   ```markdown
+   # Revue multi-persona — YYYY-MM-DD HH:MM
+
+   Diff analysé:
+
+   ```
+   <sortie de `git diff --stat` sur le même diff que l'Étape 1>
+   ```
+
+   ## Sécurité
+
+   <rapport brut de l'agent Sécurité, ou "_Analyse indisponible (échec
+   agent)._" si cet agent a échoué>
+
+   ## Perf
+
+   <rapport brut de l'agent Perf, ou message d'échec>
+
+   ## Lisibilité
+
+   <rapport brut de l'agent Lisibilité, ou message d'échec>
+
+   ## Débutant (maintenance 2 ans)
+
+   <rapport brut de l'agent Débutant, ou message d'échec>
+   ```
+
+3. Ne jamais fusionner, re-classer ou dédupliquer les findings entre
+   sections — chaque section reste le rapport brut de son agent.
+4. Répondre dans le chat avec un résumé condensé: pour chaque persona, 2 à
+   3 findings les plus importants max (pas le rapport complet), puis un
+   lien vers le fichier écrit à l'étape 2 pour le détail complet.
