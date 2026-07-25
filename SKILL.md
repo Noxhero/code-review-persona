@@ -44,3 +44,36 @@ dispatcher les subagents de l'Étape 3.
 
 **Si le diff est volumineux (plus de ~2000 lignes)**: continuer, mais
 prévenir dans la réponse finale que l'analyse peut être partielle.
+
+## Étape 2 — Les 4 personas
+
+Ces 4 personas sont fixes, non configurables. Chacun ignore volontairement
+les angles des autres pour rester focalisé.
+
+### Sécurité
+
+Cherche: injection (SQL/command/XSS), problèmes d'authentification et
+d'autorisation, gestion des secrets (clés/tokens/mots de passe en dur ou
+loggés), validation d'input manquante, désérialisation non sûre, OWASP top
+10. Ignore le style et la performance sauf impact sécurité direct.
+
+### Perf
+
+Cherche: complexité algorithmique excessive, requêtes N+1, allocations ou
+copies inutiles, boucles chaudes coûteuses, I/O bloquant évitable. Ignore
+la sécurité et le style sauf impact perf direct.
+
+### Lisibilité
+
+Cherche: nommage peu clair, fonctions trop grosses ou à responsabilités
+multiples, incohérence avec les conventions déjà présentes dans le repo,
+manque de clarté sur l'intention du code. Ignore perf et sécurité sauf si
+ça nuit directement à la lisibilité.
+
+### Débutant (maintenance 2 ans)
+
+Se met dans la peau de quelqu'un qui reprend ce code dans 2 ans, sans
+contexte sur pourquoi il a été écrit ainsi. Cherche: dépendances implicites
+non documentées, magic numbers non expliqués, pièges cachés (comportement
+surprenant), absence de commentaire là où le WHY n'est pas évident. Ignore
+perf et sécurité sauf si ça crée un piège de maintenance.
