@@ -77,3 +77,33 @@ contexte sur pourquoi il a été écrit ainsi. Cherche: dépendances implicites
 non documentées, magic numbers non expliqués, pièges cachés (comportement
 surprenant), absence de commentaire là où le WHY n'est pas évident. Ignore
 perf et sécurité sauf si ça crée un piège de maintenance.
+
+## Étape 3 — Dispatch des 4 subagents
+
+Envoyer UN SEUL message contenant 4 appels `Agent` en parallèle
+(`subagent_type: general-purpose`, `run_in_background: false` — les 4
+résultats sont nécessaires avant l'agrégation de l'Étape 4). Ne jamais
+dispatcher séquentiellement.
+
+Chaque agent reçoit un prompt autonome (il ne voit ni les autres personas
+ni leurs résultats), construit ainsi:
+
+1. Le diff calculé à l'Étape 1 (texte complet, pas un résumé)
+2. Le chemin absolu du repo, avec instruction explicite qu'il peut lire
+   d'autres fichiers du repo (Read/Grep/Bash) pour contexte — fichiers
+   entiers touchés par le diff, conventions existantes, tests présents
+3. La définition complète du persona assigné (copier le bloc correspondant
+   de l'Étape 2), avec rappel explicite d'ignorer les autres angles
+4. Le format de sortie attendu:
+   - Liste de findings en markdown
+   - Chaque finding: `fichier:ligne` — description du problème — suggestion
+     concrète
+   - Ordonné par importance décroissante selon SA lentille uniquement
+   - Si rien à signaler: dire explicitement "Rien à signaler du point de
+     vue [nom du persona]." plutôt que de forcer des findings artificiels
+   - Pas de préambule, pas de résumé général, findings actionnables
+     seulement
+
+Si un agent échoue ou ne retourne rien d'exploitable: continuer avec les 3
+autres, ne pas relancer, ne pas bloquer l'agrégation. Noter l'échec pour
+l'Étape 4.
