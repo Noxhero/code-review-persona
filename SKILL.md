@@ -45,6 +45,18 @@ dispatcher les subagents de l'Étape 3.
 **Si le diff est volumineux (plus de ~2000 lignes)**: continuer, mais
 prévenir dans la réponse finale que l'analyse peut être partielle.
 
+**Vérifier aussi les fichiers non trackés** (jamais `git add`-és, donc
+absents du diff calculé ci-dessus):
+
+```bash
+git ls-files --others --exclude-standard
+```
+
+Si cette commande retourne des fichiers: ils ne sont PAS inclus dans le
+diff et ne seront PAS reviewés. Prévenir explicitement dans la réponse
+finale (lister ces fichiers) et suggérer `git add -N .` avant de relancer
+le skill pour qu'ils soient pris en compte.
+
 ## Étape 2 — Les 4 personas
 
 Ces 4 personas sont fixes, non configurables. Chacun ignore volontairement
@@ -83,7 +95,9 @@ perf et sécurité sauf si ça crée un piège de maintenance.
 Envoyer UN SEUL message contenant 4 appels `Agent` en parallèle
 (`subagent_type: general-purpose`, `run_in_background: false` — les 4
 résultats sont nécessaires avant l'agrégation de l'Étape 4). Ne jamais
-dispatcher séquentiellement.
+dispatcher séquentiellement. Les 4 agents sont dispatchés un par persona,
+dans cet ordre fixe: Sécurité, Perf, Lisibilité, Débutant (maintenance 2
+ans).
 
 Chaque agent reçoit un prompt autonome (il ne voit ni les autres personas
 ni leurs résultats), construit ainsi:
@@ -91,7 +105,9 @@ ni leurs résultats), construit ainsi:
 1. Le diff calculé à l'Étape 1 (texte complet, pas un résumé)
 2. Le chemin absolu du repo, avec instruction explicite qu'il peut lire
    d'autres fichiers du repo (Read/Grep/Bash) pour contexte — fichiers
-   entiers touchés par le diff, conventions existantes, tests présents
+   entiers touchés par le diff, conventions existantes, tests présents.
+   Lecture seule: l'agent ne doit modifier, créer ou supprimer AUCUN
+   fichier — il retourne uniquement son rapport en texte.
 3. La définition complète du persona assigné (copier le bloc correspondant
    de l'Étape 2), avec rappel explicite d'ignorer les autres angles
 4. Le format de sortie attendu:
@@ -112,7 +128,21 @@ l'Étape 4.
 
 1. Créer le dossier `docs/reviews/` s'il n'existe pas.
 2. Écrire `docs/reviews/YYYY-MM-DD-HHMM-persona-review.md` (date/heure
-   réelles au moment de l'exécution) avec:
+   réelles au moment de l'exécution, obtenues avec `date +%Y-%m-%d-%H%M`)
+   avec:
+
+   Le bloc "Diff analysé" contient la sortie de `git diff --stat` sur le
+   même diff que l'Étape 1, c'est-à-dire:
+
+   ```bash
+   git diff --stat "$(git merge-base main HEAD)"
+   ```
+
+   ou, si le fallback de l'Étape 1 s'est déclenché:
+
+   ```bash
+   git diff --stat HEAD
+   ```
 
    ````markdown
    # Revue multi-persona — YYYY-MM-DD HH:MM
@@ -120,7 +150,7 @@ l'Étape 4.
    Diff analysé:
 
    ```
-   <sortie de `git diff --stat` sur le même diff que l'Étape 1>
+   <sortie de la commande git diff --stat correspondante ci-dessus>
    ```
 
    ## Sécurité
